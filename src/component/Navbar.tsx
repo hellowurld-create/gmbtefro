@@ -174,13 +174,41 @@ const NavBar = () => {
         };
     };
 
-    const navLinks = [
+    const hallOfFameUrl =
+        import.meta.env.VITE_HALL_OF_FAME_URL || "http://localhost:3001";
+
+    const openHallOfFame = () => {
+        const token =
+            sessionStorage.getItem("token") || localStorage.getItem("token") || "";
+        // Main Hall of Fame website (landing), not the logged-in dashboard
+        const url = new URL("/", hallOfFameUrl);
+        if (token) url.searchParams.set("token", token);
+        if (user) {
+            url.searchParams.set("email", user.email || "");
+            url.searchParams.set("firstname", user.firstname || "");
+            url.searchParams.set("lastname", user.lastname || "");
+            url.searchParams.set("role", user.role || "STUDENT");
+            url.searchParams.set("uid", user.id || "");
+        }
+        window.location.href = url.toString();
+    };
+
+    const navLinks: Array<{
+        path: string;
+        label: string;
+        external?: boolean;
+    }> = [
         { path: "/", label: "Home" },
         { path: "/about", label: "About GMBTE" },
         { path: "/partners", label: "Partners" },
-          { path: "/services", label: "Services" },
+        { path: "/services", label: "Services" },
         { path: "/events", label: "Events" },
         { path: "/contact", label: "Contact Us" },
+        {
+            path: "http://localhost:3001/",
+            label: "Hall of Fame",
+            external: true,
+        },
     ];
 
     const { firstName, lastName } = getUserDisplayName();
@@ -217,11 +245,29 @@ const NavBar = () => {
 
                 {/* Center Nav Links (DESKTOP/LARGE SCREEN) */}
               <nav className="hidden lg:flex items-center space-x-4 xl:space-x-5 2xl:space-x-8 font-medium">
-                    {navLinks.map(({ path, label }) => (
-                        <Link key={path} to={path} className={`transition duration-150 whitespace-nowrap ${isActive(path) ? "text-black font-[#001F3F] text-base" : "text-[#6B7280] text-sm hover:text-black"}`}>
-                            {label}
-                        </Link>
-                    ))}
+                    {navLinks.map(({ path, label, external }) =>
+                        external ? (
+                            <button
+                                key={path}
+                                type="button"
+                                onClick={() => {
+                                    setIsProfileOpen(false);
+                                    openHallOfFame();
+                                }}
+                                className="transition duration-150 whitespace-nowrap text-[#6B7280] text-sm hover:text-black"
+                            >
+                                {label}
+                            </button>
+                        ) : (
+                            <Link
+                                key={path}
+                                to={path}
+                                className={`transition duration-150 whitespace-nowrap ${isActive(path) ? "text-black font-[#001F3F] text-base" : "text-[#6B7280] text-sm hover:text-black"}`}
+                            >
+                                {label}
+                            </Link>
+                        )
+                    )}
                 </nav>
 
                 {/* Right Buttons - Conditionally render based on authentication */}
@@ -396,11 +442,30 @@ const NavBar = () => {
                     </div>
 
                     <nav className="flex flex-col space-y-4 text-lg font-medium text-black font-bold">
-                        {navLinks.map(({ path, label }) => (
-                            <Link key={path} to={path} onClick={handleLinkClick} className={`block py-3 px-4 rounded-xl transition duration-150 ${isActive(path) ? "bg-gray-100 font-semibold text-base" : "text-sm hover:bg-gray-50"}`}>
-                                {label}
-                            </Link>
-                        ))}
+                        {navLinks.map(({ path, label, external }) =>
+                            external ? (
+                                <button
+                                    key={path}
+                                    type="button"
+                                    onClick={() => {
+                                        handleLinkClick();
+                                        openHallOfFame();
+                                    }}
+                                    className="block py-3 px-4 rounded-xl transition duration-150 text-left text-sm hover:bg-gray-50"
+                                >
+                                    {label}
+                                </button>
+                            ) : (
+                                <Link
+                                    key={path}
+                                    to={path}
+                                    onClick={handleLinkClick}
+                                    className={`block py-3 px-4 rounded-xl transition duration-150 ${isActive(path) ? "bg-gray-100 font-semibold text-base" : "text-sm hover:bg-gray-50"}`}
+                                >
+                                    {label}
+                                </Link>
+                            )
+                        )}
                     </nav>
 
                     <div className="flex flex-col space-y-3 mt-8">

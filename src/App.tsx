@@ -31,6 +31,9 @@ import ServicesIndexPage from './component/servicesPages/servicesIndex';
 import { Toaster } from "react-hot-toast";
 import ComingSoon from './component/Authentication/Soon';
 import HallOfFameAI from './component/StudentDashboard/HOFAI/hofai';
+import FellowshipAIAssistant from './component/StudentDashboard/FelloshipAI/FelloshipAi';
+import BusinessCourseLessonPage from './component/StudentDashboard/ToolkitsSection/Courses/BusinessCourseLessonPage';
+import BusinessCourseOverviewPage from './component/StudentDashboard/ToolkitsSection/Courses/BusinessCourseOverviewPage';
 import AIDashboardIndex from './component/MarketResearchDashboard/AIDashboardIndex';
 import BPTabs from './component/MarketResearchDashboard/BusinessPlanSection/BPTabs';
 import { IGDashboardSection } from './component/MarketResearchDashboard/IdeaGenerator/IGDashboardSection';
@@ -115,42 +118,64 @@ function AppLayout() {
           <Route path="/dashboard" element={<DashboardIndex />}>
             <Route index element={<DashboardSection />} />
 
-            {/* ── LIVE at launch: Dashboard, Academy, Green Impact, Hall of Fame ── */}
-            <Route path="academy" element={<ToolkIndex />} />
-            <Route path="hall-of-fame" element={<HallOfFameAI />} /> {/* Hall of Fame AI chat — delivered */}
-            <Route path="green-impact" element={<ClimateActionIndex />} />
-            <Route path="green-impact/:courseSlug" element={<CourseOverviewPage />} />
-            <Route path="green-impact/:courseSlug/:lessonSlug" element={<CourseLessonPage />} />
-
-            {/* ── Everything else: ComingSoon until rolled out. Imports kept
-                 (not deleted) below so re-enabling later is a one-line swap. ── */}
-            <Route path="opportunities" element={<ComingSoon />} /> {/* <JobIndex /> */}
-            <Route path="opportunities/:id" element={<ComingSoon />} /> {/* <JobDetailsPage /> */}
+            <Route path="opportunities" element={<JobIndex />} />
+            <Route path="opportunities/:id" element={<JobDetailsPage />} />
             <Route path="careers" element={<Navigate to="/dashboard/opportunities" replace />} />
             <Route path="careers/:id" element={<LegacyJobRedirect />} />
 
-            <Route path="business" element={<ComingSoon />} /> {/* <ToolkitsIndex /> */}
-            <Route path="partnerships" element={<ComingSoon />} /> {/* <PartnershipsIndex /> */}
-            <Route path="pitch-deck" element={<ComingSoon />} />
-            <Route path="proposal-builder" element={<ComingSoon />} />
+            <Route path="academy" element={<ToolkIndex />} />
+            <Route path="hall-of-fame" element={<Navigate to="/dashboard/hall-of-fame-ai" replace />} />
+
+            <Route path="business" element={<ToolkitsIndex />} />
+            <Route path="business/:courseSlug" element={<BusinessCourseOverviewPage />} />
+            <Route path="business/:courseSlug/:lessonSlug" element={<BusinessCourseLessonPage />} />
+            <Route path="partnerships" element={<PartnershipsIndex />} />
+            <Route
+              path="pitch-deck"
+              element={
+                <Suspense fallback={<ToolFallback />}>
+                  <PitchDeckGenerator />
+                </Suspense>
+              }
+            />
+            <Route
+              path="proposal-builder"
+              element={
+                <Suspense fallback={<ToolFallback />}>
+                  <ProposalBuilder />
+                </Suspense>
+              }
+            />
             <Route
               path="research"
               element={<Navigate to="/dashboard/market-research" replace />}
             />
 
-            <Route path="digital-trust" element={<ComingSoon />} /> {/* <DigitalTrustIndex /> */}
-            <Route path="community" element={<ComingSoon />} /> {/* <MentorIndex /> */}
-            <Route path="events" element={<ComingSoon />} /> {/* <EventSectionIndex /> */}
+            <Route path="green-impact" element={<ClimateActionIndex />} />
+            <Route path="green-impact/:courseSlug" element={<CourseOverviewPage />} />
+            <Route path="green-impact/:courseSlug/:lessonSlug" element={<CourseLessonPage />} />
+            <Route path="digital-trust" element={<DigitalTrustIndex />} />
+            <Route path="community" element={<MentorIndex />} />
+            <Route path="events" element={<EventSectionIndex />} />
             <Route path="mentors" element={<Navigate to="/dashboard/community" replace />} />
-            <Route path="mentors-ai" element={<ComingSoon />} /> {/* <MentorIndexAI /> */}
+            <Route path="mentors-ai" element={<MentorIndexAI />} />
+            <Route path="fellowship-ai" element={<FellowshipAIAssistant />} />
+            <Route path="hall-of-fame-ai" element={<HallOfFameAI />} />
             <Route path="profile" element={<ComingSoon />} />
             <Route path="settings" element={<ComingSoon />} />
-            <Route path="brand-identity" element={<ComingSoon />} /> {/* <BrandIdentityBuilder /> */}
-            <Route path="ai-studio" element={<ComingSoon />} /> {/* <AIBusinessStudioSection /> */}
-            <Route path="idea-generator" element={<ComingSoon />} /> {/* <IGDashboardSection /> */}
-            <Route path="market-research" element={<ComingSoon />} /> {/* <MarketResearchTool /> */}
-            <Route path="opportunity-insights" element={<ComingSoon />} /> {/* <MRDashboardSection /> */}
-            <Route path="business-plan" element={<ComingSoon />} /> {/* <BPTabs /> */}
+            <Route path="brand-identity" element={<BrandIdentityBuilder />} />
+            <Route path="ai-studio" element={<AIBusinessStudioSection />} />
+            <Route path="idea-generator" element={<IGDashboardSection />} />
+            <Route
+              path="market-research"
+              element={
+                <Suspense fallback={<ToolFallback />}>
+                  <MarketResearchTool />
+                </Suspense>
+              }
+            />
+            <Route path="opportunity-insights" element={<MRDashboardSection />} />
+            <Route path="business-plan" element={<BPTabs />} />
 
             <Route path="services" element={<Navigate to="/dashboard/business" replace />} />
             <Route path="services/toolkits" element={<Navigate to="/dashboard/business" replace />} />
@@ -168,7 +193,7 @@ function AppLayout() {
             <Route path="services/toolkits/jobs/:id" element={<LegacyJobRedirect />} />
           </Route>
           <Route path="ai-dashboard" element={<AIDashboardIndex />}>
-            <Route index element={<ComingSoon />} /> {/* <AIBusinessStudioSection /> */}
+            <Route index element={<AIBusinessStudioSection />} />
             <Route path="id-generator" element={<Navigate to="/dashboard/idea-generator" replace />} />
             <Route path="market-research" element={<Navigate to="/dashboard/opportunity-insights" replace />} />
             <Route path="business-plan" element={<Navigate to="/dashboard/business-plan" replace />} />

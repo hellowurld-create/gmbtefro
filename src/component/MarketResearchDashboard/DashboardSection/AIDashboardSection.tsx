@@ -20,7 +20,12 @@ const DashboardSection = ({ hasContent = true }: Props) => {
               <DashboardHero hasContent={hasContent} />
               <DashboardStats />
 
-              <DashboardProjects />
+              <DashboardProjects
+                onNewProject={() => {
+                  const el = document.getElementById("business-planner-form");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              />
 
               <div className="grid gap-6 lg:grid-cols-2">
                 <DashboardActivity />

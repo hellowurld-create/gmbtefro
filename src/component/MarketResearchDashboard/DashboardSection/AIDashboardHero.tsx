@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
 import { ArrowRight, FileText, Search } from "lucide-react";
-import BeeWatermark from "../ui/BeeWatermark";
-import AIDashboardButton from "../ui/AIDashboardButton";
-import AIDashboardCard from "../ui/AIDashboardCard";
-import InputField from "../ui/InputField";
+import { useState } from "react";
 import {
   generateBusinessPlan,
   type GeneratePlanPayload,
 } from "../lib/businessPlannerApi";
+import AIDashboardButton from "../ui/AIDashboardButton";
+import AIDashboardCard from "../ui/AIDashboardCard";
+import BeeWatermark from "../ui/BeeWatermark";
+import InputField from "../ui/InputField";
 import { GeneratedPlanResult } from "./generatedplan";
 
 type Props = {
@@ -154,7 +154,7 @@ export default function DashboardHero({
               label="Budget Range"
               placeholder="Select Budget"
               type="select"
-              options={["$0–$500", "$500–$5k", "$5k+"]}
+              options={["₤0–₤500", "₤500–₤5k", "₤5k+"]}
               value={form.budget}
               onChange={(value) => updateField("budget", value)}
             />

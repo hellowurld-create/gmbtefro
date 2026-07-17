@@ -436,8 +436,8 @@ export default function BrandIdentityBuilder() {
   };
 
   const fetchExports = async (assetId: string) => {
-    const result = await api.get(`/assets/${assetId}/export`);
-    setExportsData(result.data);
+    const result = await api.get(`/brand-identity/assets/${assetId}/export`);
+    setExportsData(result.data?.data);
   };
 
   const pollStatus = (assetId: string) => {
@@ -445,8 +445,8 @@ export default function BrandIdentityBuilder() {
 
     pollingRef.current = window.setInterval(async () => {
       try {
-        const result = await api.get(`/assets/${assetId}/status`);
-        const statusData = result.data.data;
+        const result = await api.get(`/brand-identity/assets/${assetId}/status`);
+        const statusData = result.data?.data;
 
         setAssetStatus(statusData);
 
@@ -493,17 +493,17 @@ export default function BrandIdentityBuilder() {
       const assetType = assetTypeMap[activeTool];
 
       const result = await api.post(
-        `/assets/generate/${assetType}`,
+        `/brand-identity/assets/generate/${assetType}`,
         payload
       );
 
-      const assetId = result.data?.asset_id;
+      const assetId = result.data?.data?.asset_id;
 
       if (!assetId) {
         throw new Error("No asset ID returned.");
       }
 
-      setAssetStatus(result.data);
+      setAssetStatus(result.data?.data);
       pollStatus(assetId);
     } catch (err: any) {
       setView("form");
@@ -857,7 +857,7 @@ function ResultPanel({
 function Preview({
   tool,
   values,
-  colors: _colors,
+  colors,
 }: {
   tool: ToolKey;
   values: Record<string, string>;

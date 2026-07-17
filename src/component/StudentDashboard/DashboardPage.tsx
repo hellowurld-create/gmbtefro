@@ -35,6 +35,8 @@ type NavItem = {
   icon: React.ReactNode;
   path: string;
   badge?: string;
+  /** Opens another app (Hall of Fame dashboard) instead of an in-app route */
+  external?: boolean;
 };
 
 type NavGroup = {
@@ -82,7 +84,7 @@ const Dashboard: React.FC = () => {
   const [aiStudioOpen, setAiStudioOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const isMentorAiPage = location.pathname.includes('/mentors-ai');
   const isAiStudioRoute = AI_STUDIO_PATHS.some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`)
@@ -114,6 +116,24 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const hallOfFameBaseUrl = 'http://localhost:3001';
+
+  const openExternalNav = (path: string) => {
+    const token =
+      sessionStorage.getItem('token') || localStorage.getItem('token') || '';
+    const url = new URL(path, hallOfFameBaseUrl);
+    if (token) url.searchParams.set('token', token);
+    // Carry identity so Hall of Fame can show the same user without a second login
+    if (user) {
+      url.searchParams.set('email', user.email || '');
+      url.searchParams.set('firstname', user.firstname || '');
+      url.searchParams.set('lastname', user.lastname || '');
+      url.searchParams.set('role', user.role || 'STUDENT');
+      url.searchParams.set('uid', user.id || '');
+    }
+    window.location.href = url.toString();
+  };
+
   const iconClass = 'h-4 w-4 lg:h-[18px] lg:w-[18px]';
 
   const navSections: {
@@ -142,7 +162,8 @@ const Dashboard: React.FC = () => {
           {
             name: 'Hall of Fame',
             icon: <Trophy className={iconClass} />,
-            path: '/dashboard/hall-of-fame',
+            path: 'http://localhost:3001/hall-of-fame-dashboard',
+            external: true,
           },
         ],
       },
@@ -164,11 +185,11 @@ const Dashboard: React.FC = () => {
             icon: <ShieldCheck className={iconClass} />,
             path: '/dashboard/digital-trust',
           },
-          {
-            name: 'Partnerships',
-            icon: <Handshake className={iconClass} />,
-            path: '/dashboard/partnerships',
-          },
+          // {
+          //   name: 'Partnerships',
+          //   icon: <Handshake className={iconClass} />,
+          //   path: '/dashboard/partnerships',
+          // },
         ],
       },
       {
@@ -195,59 +216,71 @@ const Dashboard: React.FC = () => {
             path: '/dashboard/mentors-ai',
             badge: 'AI',
           },
-        ],
-      },
-      {
-        title: 'PRODUCTIVITY TOOLS',
-        items: [
           {
-            name: 'AI Business Studio',
-            icon: <LayoutDashboard className={iconClass} />,
-            children: [
-              {
-                name: 'AI Business Studio Dashboard',
-                icon: <LayoutDashboard className={iconClass} />,
-                path: '/dashboard/ai-studio',
-              },
-              {
-                name: 'Idea Generator',
-                icon: <Lightbulb className={iconClass} />,
-                path: '/dashboard/idea-generator',
-              },
-              {
-                name: 'Opportunity Insights',
-                icon: <TrendingUp className={iconClass} />,
-                path: '/dashboard/opportunity-insights',
-              },
-              {
-                name: 'Business Plan AI',
-                icon: <FileText className={iconClass} />,
-                path: '/dashboard/business-plan',
-              },
-            ],
+            name: 'Fellowship AI',
+            icon: <Award className={iconClass} />,
+            path: '/dashboard/fellowship-ai',
+            badge: 'AI',
           },
           {
-            name: 'Brand Identity',
-            icon: <Palette className={iconClass} />,
-            path: '/dashboard/brand-identity',
-          },
-          {
-            name: 'Market Research AI',
-            icon: <BarChart3 className={iconClass} />,
-            path: '/dashboard/market-research',
-          },
-          {
-            name: 'Pitch Deck Builder',
-            icon: <Presentation className={iconClass} />,
-            path: '/dashboard/pitch-deck',
-          },
-          {
-            name: 'Proposal Builder AI',
-            icon: <Clock3 className={iconClass} />,
-            path: '/dashboard/proposal-builder',
+            name: 'HOF AI',
+            icon: <Trophy className={iconClass} />,
+            path: '/dashboard/hall-of-fame-ai',
+            badge: 'AI',
           },
         ],
       },
+      // {
+      //   title: 'PRODUCTIVITY TOOLS',
+      //   items: [
+      //     {
+      //       name: 'AI Business Studio',
+      //       icon: <LayoutDashboard className={iconClass} />,
+      //       children: [
+      //         {
+      //           name: 'AI Business Studio Dashboard',
+      //           icon: <LayoutDashboard className={iconClass} />,
+      //           path: '/dashboard/ai-studio',
+      //         },
+      //         {
+      //           name: 'Idea Generator',
+      //           icon: <Lightbulb className={iconClass} />,
+      //           path: '/dashboard/idea-generator',
+      //         },
+      //         {
+      //           name: 'Opportunity Insights',
+      //           icon: <TrendingUp className={iconClass} />,
+      //           path: '/dashboard/opportunity-insights',
+      //         },
+      //         {
+      //           name: 'Business Plan AI',
+      //           icon: <FileText className={iconClass} />,
+      //           path: '/dashboard/business-plan',
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       name: 'Brand Identity',
+      //       icon: <Palette className={iconClass} />,
+      //       path: '/dashboard/brand-identity',
+      //     },
+      //     {
+      //       name: 'Market Research AI',
+      //       icon: <BarChart3 className={iconClass} />,
+      //       path: '/dashboard/market-research',
+      //     },
+      //     {
+      //       name: 'Pitch Deck Builder',
+      //       icon: <Presentation className={iconClass} />,
+      //       path: '/dashboard/pitch-deck',
+      //     },
+      //     {
+      //       name: 'Proposal Builder AI',
+      //       icon: <Clock3 className={iconClass} />,
+      //       path: '/dashboard/proposal-builder',
+      //     },
+      //   ],
+      // },
       {
         items: [
           {
@@ -394,7 +427,30 @@ const Dashboard: React.FC = () => {
                     );
                   }
 
-                  return (
+                  return entry.external ? (
+                    <button
+                      key={entry.name}
+                      type="button"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        openExternalNav(entry.path);
+                      }}
+                      className={`
+                          mx-3 flex w-[calc(100%-1.5rem)] items-center gap-2.5 rounded-lg py-2.5 text-sm transition-colors
+                          text-white/80 hover:bg-white/10
+                          ${showExpandedSidebar ? 'px-3' : 'justify-center px-0'}
+                        `}
+                      title={!showExpandedSidebar ? entry.name : undefined}
+                    >
+                      <span className="flex-shrink-0 text-white/80">{entry.icon}</span>
+                      {showExpandedSidebar && <span>{entry.name}</span>}
+                      {entry.badge && showExpandedSidebar && (
+                        <span className="ml-auto rounded-full bg-[#FFD700] px-1.5 py-0.5 text-[9px] font-extrabold text-[#001F3F]">
+                          {entry.badge}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
                     <NavLink
                       key={entry.name}
                       to={entry.path}
