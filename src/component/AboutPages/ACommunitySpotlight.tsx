@@ -112,11 +112,11 @@ const ACommunitySpotlight: FC = () => {
     },
      {
       image: "/spotlight/woman1.png",
-      name: "Amara",
-      lname: "Johnson",
+      name: "Rose",
+      lname: "Ududu",
       role: "Software Engineer at MediaCityUK",
       description:
-        "Meet Amara Johnson, who began her journey through our mentorship program and now inspires young developers across Manchester.",
+        "Meet Rose Ududu, who began her journey through our mentorship program and now inspires young developers across Manchester.",
     },
     {
       image: "/spotlight/woman2.png",
